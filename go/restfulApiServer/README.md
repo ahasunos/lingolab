@@ -47,3 +47,12 @@ jsonEncoder := json.NewEncoder(responseWriter)
 // Encode writes the JSON encoding of v to the stream, followed by a newline character.
 jsonEncoder.Encode(characters)
 ```
+
+Next, used gorilla mux as it provides extended support than net/http package.
+Syntax is similar except we can extend out HandleFunc to handle particular http verbs.
+Example:
+httpRouter.HandleFunc("/", office).Methods("GET")
+
+Trying to invoke with POST verb for that endpoint would return 405Method Not Allowed.
+
+The HandleFunc would work even without .Methods but wouldn't be able to handle the http verb filtering.
