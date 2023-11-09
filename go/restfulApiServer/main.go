@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 type Character struct {
@@ -13,6 +15,8 @@ type Character struct {
 }
 
 type Characters []Character
+
+var CharactersDB Characters
 
 func getCharacters(responseWriter http.ResponseWriter, request *http.Request) {
 	characters := fetchCharacters()
@@ -39,10 +43,30 @@ func office(responseWriter http.ResponseWriter, request *http.Request) {
 }
 
 func requestHandler() {
+
+	// Using gorilla mux, as it provides verbs
+	// Earlier using any http verbs on the APIs were returning values
+
+	// func mux.NewRouter() *mux.Router
+	// NewRouter returns a new router instance.
+	// StrictSlash defines the trailing slash behavior for new routes.
+	// The initial value is false.
+
+	// When true, if the route path is "/path/",
+	// accessing "/path" will perform a redirect to the former and vice versa.
+	// In other words, your application will always see the path as specified in the route.
+
+	httpRouter := mux.NewRouter().StrictSlash(true)
+
+	// As provided by default net/http package:
 	// HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 	// HandleFunc registers the handler function for the given pattern in the DefaultServeMux.
-	http.HandleFunc("/", office)
-	http.HandleFunc("/characters", getCharacters)
+
+	// For gorilla mux:
+	// HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) *mux.Route
+	// HandleFunc registers a new route with a matcher for the URL path. See Route.Path() and Route.HandlerFunc().
+	httpRouter.HandleFunc("/", office).Methods("GET")
+	httpRouter.HandleFunc("/characters", getCharacters).Methods("GET")
 
 	// ListenAndServe(addr string, handler http.Handler) error
 	// ListenAndServe listens on the TCP network address addr and then calls Serve with handler to handle requests on incoming connections.
@@ -50,7 +74,7 @@ func requestHandler() {
 	// The handler is typically nil, in which case the DefaultServeMux is used.
 	// ListenAndServe always returns a non-nil error.
 
-	http.ListenAndServe("127.0.0.1:8080", nil) // Using DefaultServeMux, hence sending nil for second parameters
+	http.ListenAndServe("127.0.0.1:8080", httpRouter) // Using DefaultServeMux, hence sending nil for second parameters
 }
 
 func main() {
@@ -59,12 +83,11 @@ func main() {
 
 func fetchCharacters() Characters {
 	// Ideally, this should have been fetched from database or something!
-	return Characters{
-		Character{
-			Name:     "Michael Scott",
-			RealName: "Steve Carell",
-			Role:     "Regional Manager",
-		},
+	CharactersDB = append(CharactersDB, Character{
+		Name:     "Michael Scott",
+		RealName: "Steve Carell",
+		Role:     "Regional Manager",
+	},
 		Character{
 			Name:     "Jim Halpert",
 			RealName: "John Krasinski",
@@ -74,6 +97,6 @@ func fetchCharacters() Characters {
 			Name:     "Dwight Schrute",
 			RealName: "Rainn Wilson",
 			Role:     "Assistant (to the) Regional Manager",
-		},
-	}
+		})
+	return CharactersDB
 }
