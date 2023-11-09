@@ -19,7 +19,7 @@ type Characters []Character
 var CharactersDB Characters
 
 func getCharacters(responseWriter http.ResponseWriter, request *http.Request) {
-	characters := fetchCharacters()
+	characters := CharactersDB
 	fmt.Println("getCharacters endpoint hit")
 
 	// NewEncoder(w io.Writer) *json.Encoder
@@ -33,6 +33,53 @@ func getCharacters(responseWriter http.ResponseWriter, request *http.Request) {
 	// The above could have been achieved in a single line like below:
 	// I broken down so that I could know about both NewEncoder and Encode
 	// json.NewEncoder(responseWrite).Encode(characters)
+}
+
+// Dummy payload for post api
+// {
+// 	"Name": "Pam Beesly (Pamela)",
+// 	"RealName": "Jenna Fischer",
+// 	"Role": "Receptionist"
+// }
+
+// {
+// 	"Name": "Kevin Malone",
+// 	"RealName": "Brian Baumgartner",
+// 	"Role": "Accountant"
+// }
+
+func postCharacters(responseWriter http.ResponseWriter, request *http.Request) {
+	fmt.Println("Post endpoint hit")
+
+	// func (http.ResponseWriter).Header() http.Header
+	// Header returns the header map that will be sent by WriteHeader. The Header map also is the mechanism with which Handlers can set HTTP trailers.
+
+	// Set(key string, value string)
+	// Set sets the header entries associated with key to the single element value.
+	// It replaces any existing values associated with key.
+	// The key is case insensitive; it is canonicalized by textproto.CanonicalMIMEHeaderKey.
+	// To use non-canonical keys, assign to the map directly.
+
+	responseWriter.Header().Set("Content-Type", "application/json")
+
+	var character Character
+
+	// NewDecoder(r io.Reader) *json.Decoder
+	// NewDecoder returns a new decoder that reads from r.
+	// The decoder introduces its own buffering and may read data from r beyond the JSON values requested.
+	jsonDecoder := json.NewDecoder(request.Body)
+
+	// func (*json.Decoder).Decode(v any) error
+	// Decode reads the next JSON-encoded value from its input and stores it in the value pointed to by v.
+	err := jsonDecoder.Decode(&character)
+	if err != nil {
+		responseWriter.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(responseWriter, "Bad request, post valid payload!")
+		return
+	}
+
+	CharactersDB = append(CharactersDB, character)
+	json.NewEncoder(responseWriter).Encode(character)
 }
 
 func office(responseWriter http.ResponseWriter, request *http.Request) {
@@ -67,6 +114,7 @@ func requestHandler() {
 	// HandleFunc registers a new route with a matcher for the URL path. See Route.Path() and Route.HandlerFunc().
 	httpRouter.HandleFunc("/", office).Methods("GET")
 	httpRouter.HandleFunc("/characters", getCharacters).Methods("GET")
+	httpRouter.HandleFunc("/addCharacters", postCharacters).Methods("POST")
 
 	// ListenAndServe(addr string, handler http.Handler) error
 	// ListenAndServe listens on the TCP network address addr and then calls Serve with handler to handle requests on incoming connections.
@@ -78,10 +126,12 @@ func requestHandler() {
 }
 
 func main() {
+	loadCharacters()
+	fmt.Println("Server is starting...")
 	requestHandler()
 }
 
-func fetchCharacters() Characters {
+func loadCharacters() {
 	// Ideally, this should have been fetched from database or something!
 	CharactersDB = append(CharactersDB, Character{
 		Name:     "Michael Scott",
@@ -98,5 +148,4 @@ func fetchCharacters() Characters {
 			RealName: "Rainn Wilson",
 			Role:     "Assistant (to the) Regional Manager",
 		})
-	return CharactersDB
 }
