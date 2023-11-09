@@ -42,6 +42,7 @@ func requestHandler() {
 	// HandleFunc(pattern string, handler func(http.ResponseWriter, *http.Request))
 	// HandleFunc registers the handler function for the given pattern in the DefaultServeMux.
 	http.HandleFunc("/", office)
+	http.HandleFunc("/characters", getCharacters)
 
 	// ListenAndServe(addr string, handler http.Handler) error
 	// ListenAndServe listens on the TCP network address addr and then calls Serve with handler to handle requests on incoming connections.
