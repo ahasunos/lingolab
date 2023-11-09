@@ -1,9 +1,35 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
+
+type Character struct {
+	Name     string `json:"Name"`
+	RealName string `json:"RealName"`
+	Role     string `json:"Role"`
+}
+
+type Characters []Character
+
+func getCharacters(responseWriter http.ResponseWriter, request *http.Request) {
+	characters := fetchCharacters()
+	fmt.Println("getCharacters endpoint hit")
+
+	// NewEncoder(w io.Writer) *json.Encoder
+	// NewEncoder returns a new encoder that writes to w.
+	jsonEncoder := json.NewEncoder(responseWriter)
+
+	// Encode(v any) error
+	// Encode writes the JSON encoding of v to the stream, followed by a newline character.
+	jsonEncoder.Encode(characters)
+
+	// The above could have been achieved in a single line like below:
+	// I broken down so that I could know about both NewEncoder and Encode
+	// json.NewEncoder(responseWrite).Encode(characters)
+}
 
 func office(responseWriter http.ResponseWriter, request *http.Request) {
 	// Fprintf(w io.Writer, format string, a ...any) (n int, err error)
@@ -28,4 +54,25 @@ func requestHandler() {
 
 func main() {
 	requestHandler()
+}
+
+func fetchCharacters() Characters {
+	// Ideally, this should have been fetched from database or something!
+	return Characters{
+		Character{
+			Name:     "Michael Scott",
+			RealName: "Steve Carell",
+			Role:     "Regional Manager",
+		},
+		Character{
+			Name:     "Jim Halpert",
+			RealName: "John Krasinski",
+			Role:     "Sales Representative",
+		},
+		Character{
+			Name:     "Dwight Schrute",
+			RealName: "Rainn Wilson",
+			Role:     "Assistant (to the) Regional Manager",
+		},
+	}
 }
