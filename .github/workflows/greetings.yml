@@ -1,0 +1,16 @@
+name: Greetings
+
+on: [pull_request_target, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      pull-requests: write
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: "Welcome to lingolab! 🎉 Thank you for opening your first issue. Please make sure to review our contribution guidelines and engage with our community. Happy coding!"
+        pr-message: "Thanks for your first Pull Request! 🚀 Please review our contribution guidelines, ensure your changes align with project standards, and feel free to engage with our community. Happy collaborating!"
