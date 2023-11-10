@@ -122,7 +122,7 @@ func requestHandler() {
 	// The handler is typically nil, in which case the DefaultServeMux is used.
 	// ListenAndServe always returns a non-nil error.
 
-	http.ListenAndServe("127.0.0.1:8080", httpRouter) // Using DefaultServeMux, hence sending nil for second parameters
+	http.ListenAndServe("0.0.0.0:8080", httpRouter) // Using DefaultServeMux, hence sending nil for second parameters
 }
 
 func main() {
