@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -85,6 +86,82 @@ func postCharacters(responseWriter http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(responseWriter).Encode(character)
 }
 
+func updateCharacters(responseWriter http.ResponseWriter, request *http.Request) {
+	fmt.Println("Put endpoint hit")
+
+	// func mux.Vars(r *http.Request) map[string]string
+	// Vars returns the route variables for the current request, if any.
+	vars := mux.Vars(request)
+
+	character_id, err := strconv.Atoi(vars["Id"])
+
+	if err != nil {
+		responseWriter.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(responseWriter, "Invalid character Id!")
+		return
+	}
+
+	fmt.Println(character_id)
+	var updateCharacter Character
+
+	jsonDecoder := json.NewDecoder(request.Body)
+
+	err = jsonDecoder.Decode(&updateCharacter)
+
+	if err != nil {
+		responseWriter.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(responseWriter, "Bad request, post valid payload!")
+		return
+	}
+
+	for i, ch := range CharactersDB {
+		fmt.Println(i)
+		fmt.Println(ch)
+
+		if ch.Id == int64(character_id) {
+			// Update the character in the database
+			CharactersDB[i] = updateCharacter
+
+			// Return the updated character as JSON
+			responseWriter.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(responseWriter).Encode(updateCharacter)
+			return
+		}
+	}
+}
+
+func deleteCharacters(responseWriter http.ResponseWriter, request *http.Request) {
+	vars := mux.Vars(request)
+
+	character_id, err := strconv.Atoi(vars["Id"])
+
+	if err != nil {
+		responseWriter.WriteHeader(http.StatusBadRequest)
+
+	}
+
+	var ch_index int
+
+	for i, ch := range CharactersDB {
+		if ch.Id == int64(character_id) {
+			ch_index = i
+			break
+		}
+		ch_index += 1
+	}
+
+	if ch_index == -1 {
+		http.Error(responseWriter, "No character found", http.StatusNotFound)
+		return
+	}
+
+	CharactersDB = append(CharactersDB[:ch_index], CharactersDB[ch_index+1:]...)
+
+	responseWriter.WriteHeader(http.StatusOK)
+
+	responseWriter.Write([]byte("Character deleted successfully"))
+}
+
 func office(responseWriter http.ResponseWriter, request *http.Request) {
 	// Fprintf(w io.Writer, format string, a ...any) (n int, err error)
 	// Fprintf formats according to a format specifier and writes to w.
@@ -118,6 +195,8 @@ func requestHandler() {
 	httpRouter.HandleFunc("/", office).Methods("GET")
 	httpRouter.HandleFunc("/characters", getCharacters).Methods("GET")
 	httpRouter.HandleFunc("/addCharacters", postCharacters).Methods("POST")
+	httpRouter.HandleFunc("/updateCharacters/{Id}", updateCharacters).Methods("PUT")
+	httpRouter.HandleFunc("/delCharacters/{Id}", deleteCharacters).Methods("DELETE")
 
 	// ListenAndServe(addr string, handler http.Handler) error
 	// ListenAndServe listens on the TCP network address addr and then calls Serve with handler to handle requests on incoming connections.
