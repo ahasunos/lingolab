@@ -9,6 +9,7 @@ import (
 )
 
 type Character struct {
+	Id       int64  `json:"Id"`
 	Name     string `json:"Name"`
 	RealName string `json:"RealName"`
 	Role     string `json:"Role"`
@@ -37,12 +38,14 @@ func getCharacters(responseWriter http.ResponseWriter, request *http.Request) {
 
 // Dummy payload for post api
 // {
+// 	"Id": 4
 // 	"Name": "Pam Beesly (Pamela)",
 // 	"RealName": "Jenna Fischer",
 // 	"Role": "Receptionist"
 // }
 
 // {
+//  "Id": 5
 // 	"Name": "Kevin Malone",
 // 	"RealName": "Brian Baumgartner",
 // 	"Role": "Accountant"
@@ -134,16 +137,19 @@ func main() {
 func loadCharacters() {
 	// Ideally, this should have been fetched from database or something!
 	CharactersDB = append(CharactersDB, Character{
+		Id:       1,
 		Name:     "Michael Scott",
 		RealName: "Steve Carell",
 		Role:     "Regional Manager",
 	},
 		Character{
+			Id:       2,
 			Name:     "Jim Halpert",
 			RealName: "John Krasinski",
 			Role:     "Sales Representative",
 		},
 		Character{
+			Id:       3,
 			Name:     "Dwight Schrute",
 			RealName: "Rainn Wilson",
 			Role:     "Assistant (to the) Regional Manager",
