@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	"github.com/ahasunos/lingolab/go/ginandgorm/controllers"
 	"github.com/ahasunos/lingolab/go/ginandgorm/initializers"
 	"github.com/ahasunos/lingolab/go/ginandgorm/models"
 	"github.com/gin-gonic/gin"
@@ -23,6 +24,8 @@ func requestHandler() {
 	// func (*gin.RouterGroup).GET(relativePath string, handlers ...gin.HandlerFunc) gin.IRoutes
 	// GET is a shortcut for router.Handle("GET", path, handlers).
 	r.GET("/", home) // This could be specified as: r.Handle("GET", "/", home)
+	r.GET("/getCharacters", controllers.GetCharacters)
+	r.POST("/addCharacters", controllers.AddCharacters)
 
 	// func (*gin.Engine).Run(addr ...string) (err error)
 	// Run attaches the router to a http.Server and starts listening and serving HTTP requests.
