@@ -15,7 +15,7 @@ func home(c *gin.Context) {
 	})
 }
 
-func requestHandler() {
+func hostAndServe() {
 
 	// func gin.Default() *gin.Engine
 	// Default returns an Engine instance with the Logger and Recovery middleware already attached
@@ -43,5 +43,5 @@ func main() {
 	// Migrate the schema
 	initializers.DB.AutoMigrate(&models.Character{})
 	fmt.Println("Starting server...")
-	requestHandler()
+	hostAndServe()
 }
