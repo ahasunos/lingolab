@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 
+	"github.com/ahasunos/lingolab/go/ginandgorm/initializers"
+	"github.com/ahasunos/lingolab/go/ginandgorm/models"
 	"github.com/gin-gonic/gin"
 )
 
-func home(context *gin.Context) {
-	context.JSON(200, gin.H{
-		"message": "ping",
-		"greet":   "hello",
+func home(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message": "Homepage live: Where APIs flow smoother than Michael's awkward office moments!",
 	})
 }
 
@@ -30,7 +31,14 @@ func requestHandler() {
 	r.Run() // listen and serve on 0.0.0.0:8080, since address is not specified!
 }
 
+func init() {
+	initializers.LoadEnvVars()
+	initializers.ConnectDB()
+}
+
 func main() {
+	// Migrate the schema
+	initializers.DB.AutoMigrate(&models.Character{})
 	fmt.Println("Starting server...")
 	requestHandler()
 }
