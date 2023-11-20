@@ -118,3 +118,52 @@ func UpdateCharacters(c *gin.Context) {
 		"character updated": charinDB,
 	})
 }
+
+func DeleteCharacterByID(c *gin.Context) {
+	// get id of the url
+	id := c.Param("id")
+
+	var character models.Character
+
+	result := initializers.DB.Delete(&character, id)
+
+	if result.Error != nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"error": "Character not deleted",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"character deleted": character,
+	})
+}
+
+func DeleteAllCharacters(c *gin.Context) {
+
+	var chars []models.Character
+
+	// Find finds all characters
+	result := initializers.DB.Find(&chars)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to fetch characters for deletion",
+		})
+		return
+	}
+
+	// delete all
+	result = initializers.DB.Delete(&chars)
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to delete characters",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "All characters deleted successfully",
+	})
+
+}

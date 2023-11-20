@@ -28,6 +28,8 @@ func hostAndServe() {
 	r.GET("/getCharacters/:id", controllers.GetCharacterByID)
 	r.POST("/addCharacters", controllers.AddCharacters)
 	r.PUT("/updateCharacters/:id", controllers.UpdateCharacters)
+	r.DELETE("/deleteCharacters/:id", controllers.DeleteCharacterByID)
+	r.DELETE("/deleteAllCharacters", controllers.DeleteAllCharacters)
 
 	// func (*gin.Engine).Run(addr ...string) (err error)
 	// Run attaches the router to a http.Server and starts listening and serving HTTP requests.
