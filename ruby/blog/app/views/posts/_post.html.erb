@@ -13,4 +13,8 @@
     <%= post.content %>
   </p>
 
+  <p>
+   <%= pluralize post.comments.count, "comment"  %>
+  </p>
+
 </div>
